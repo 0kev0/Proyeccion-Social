@@ -187,9 +187,10 @@ class UserController extends Controller
     //mostrar usuario especifico
     public function showPerfil($id)
     {
-        $usuario = User::findOrFail($id);
+        $usuario = User::findOrFail($id)->pluck();
         return view('perfil.perfilUsuario', compact('usuario'));
     }
+
     public function allSeccion()
     {
         $secciones = Seccion::all();

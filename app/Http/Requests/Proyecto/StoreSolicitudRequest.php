@@ -12,7 +12,7 @@ class StoreSolicitudRequest extends FormRequest
     public function authorize(): bool
     {
         // regla para verificar permiso 
-        return auth()->user()->hasAnyRole(['Administrador', 'Coordinador']);
+        return true;
     }
 
     /**

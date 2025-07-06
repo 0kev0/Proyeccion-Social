@@ -16,7 +16,7 @@
 
                 <div class="mb-3">
                     <label for="descripcion" class="form-label">Descripción del proyecto</label>
-                    <textarea class="form-control" id="descripcion" name="descripcion" >{{ old('descripcion') }}</textarea>
+                    <textarea class="form-control" id="descripcion" name="descripcion">{{ old('descripcion') }}</textarea>
                 </div>
 
                 <div class="row">
@@ -25,6 +25,18 @@
                         <input type="number" class="form-control" id="horas" name="horas"
                             value="{{ old('horas') }}" required>
                     </div>
+<!--
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="fechaInicio" class="form-label">Fecha de Inicio</label>
+                            <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="fechaFin" class="form-label">Fecha de Finalización</label>
+                            <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" readonly>
+                        </div>
+                    </div>
+-->
                     <div class="col-md-6 mb-3">
                         <label for="ubicacion" class="form-label">Ubicación</label>
                         <input type="text" class="form-control" id="ubicacion" name="ubicacion"

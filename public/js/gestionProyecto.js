@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
         seccionSelect.disabled = false;
 
         // Limpiar opciones del select de proyectosestudianteSelect.remove(estudianteSelect.selectedIndex);
-      ///  proyectoSelect.innerHTML = '<option selected disabled>Seleccionar proyecto</option>';
+        ///  proyectoSelect.innerHTML = '<option selected disabled>Seleccionar proyecto</option>';
 
         // Cargar proyectos por sección
         fetch(`/proyectos-por-seccion/${seccionId}`)//////////////////////////////////url
@@ -199,20 +199,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
 
                     preloader.style.display = 'none';
+                    const fechaInicio = data.fecha_inicio ? data.fecha_inicio.split('T')[0] : '';
+                    const fechaFin = data.fecha_fin ? data.fecha_fin.split('T')[0] : '';
 
                     alert(`Datos del Proyecto:\n
                         Ubicación: ${data.ubicacion || 'No disponible'}\n
-                        Fecha de Inicio: ${data.fecha_inicio || 'No disponible'}\n
-                        Fecha de Fin: ${data.fecha_fin || 'No disponible'}\n
+                        Fecha de Inicio: ${fechaInicio}\n
+                        Fecha de Fin: ${fechaFin}\n
                         Horas Requeridas: ${data.horas_requeridas || 'No disponible'}\n
                         Sección: ${data.seccion ? data.seccion.nombre : 'No disponible'}\n
                         Estudiantes: ${data.estudiantes && data.estudiantes.length > 0 ? data.estudiantes.map(est => est.name).join(', ') : 'No estudiantes'}`
                     );
 
+
                     // Rellenar los campos con los datos del proyecto
                     ubicacionInput.value = data.ubicacion || '';
-                    fechaInicioInput.value = data.fecha_inicio || '';
-                    fechaFinInput.value = data.fecha_fin || '';
+                    fechaInicioInput.value = fechaInicio || '';
+                    fechaFinInput.value = fechaFin || '';
                     horasinInput.value = data.horas_requeridas || '';
                     seccionSelect.innerHTML = '';
                     const option = document.createElement('option');

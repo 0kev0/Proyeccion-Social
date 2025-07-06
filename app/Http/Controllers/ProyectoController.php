@@ -70,7 +70,7 @@ class ProyectoController extends Controller
     {
         return $this->hasMany(Asignacion::class, 'id_proyecto', 'id_proyecto');
     }
-    
+
 
     //agregar id de estudiantes a un proyecto en fase de solicitud
     //to service
@@ -104,8 +104,9 @@ class ProyectoController extends Controller
             $proyecto->periodo = now()->format('Y-m');
             $proyecto->coordinador = auth()->id();  // Coordinador actual
             $proyecto->seccion_id = $request['id_seccion'];
-            $proyecto->fecha_inicio = now();
-            $proyecto->fecha_fin = now()->addMonths(3);
+            $proyecto->fecha_inicio = now()->toDateString();  // Solo la fecha en formato 'Y-m-d'
+            $proyecto->fecha_fin = now()->addMonths(3)->toDateString();  // Solo la fecha, sumando 3 meses
+
 
             // Validar lógica de fechas
             if ($proyecto->fecha_fin <= $proyecto->fecha_inicio) {  // Fecha de finalización debe ser posterior a la de inicio 
@@ -135,6 +136,13 @@ class ProyectoController extends Controller
         }
     }
 
+    public function retornar_departamentos()
+    {
+
+        $departamentos = Departamento::select('id_departamento', 'nombre_departamento')->get();
+        $secciones = Seccion::with('Departamento:id_seccion,nombre_seccion')->get();
+        return view("proyecto.publicar-proyecto", compact('departamentos', 'secciones'));
+    }
     public function show(string $id)
     {
         $proyecto = Proyecto::find($id);
@@ -147,7 +155,7 @@ class ProyectoController extends Controller
         $estados = Estado::all();
         $estudiantes = Estudiante::all();
         $secciones = Seccion::all();
-        $tutores = User::role('tutor')
+        $tutores = User::role('Tutor')
             ->whereHas('seccionesTutoreadas')
             ->with('seccionesTutoreadas')
             ->get();
@@ -205,39 +213,8 @@ class ProyectoController extends Controller
 
         return view("gestionProyectos.gestionProyectos", compact('proyectos', 'estados', 'estudiantes', 'tutores', 'secciones'));
     }
+
     //###########################################################################################
-    public function update(Request $request, $id)
-    {
-        $data = $request->validate([
-            'nombre_proyecto' => 'required|string|max:255',
-            'estado' => 'required|integer',
-            'periodo' => 'required|string|max:255',
-            'lugar' => 'required|string|max:255',
-            'coordinador' => 'required|integer',
-            'id_seccion' => 'required|integer',
-        ]);
-
-        $proyecto = Proyecto::find($id);
-
-        if (!$proyecto) {
-            return redirect()->route('proyectos.index')->with('error', 'Proyecto no encontrado');
-        }
-
-
-        $proyectoExistente = Proyecto::where('nombre_proyecto', $data['nombre_proyecto'])
-            ->where('id', '!=', $id) // oviando el id actual
-            ->first();
-
-        //validar que no exista el mismo nombre de proyecto
-        if ($proyectoExistente) {
-            return back()->withErrors(['titulo' => 'Ya existe un proyecto con este nombre.'])->withInput();
-        }
-
-        $proyecto->update($data);
-        return redirect()->route('proyectos.index')->with('success', 'Proyecto actualizado con éxito');
-    }
-
-//###########################################################################################
     public function actualizar(Request $request, $id)
     {
         // dd($request->all());
@@ -301,7 +278,7 @@ class ProyectoController extends Controller
         $proyecto->delete();
 
         $currentRoute = request()->route()->getName();
-                //ruta a cambiar
+        //ruta a cambiar
 
         if ($currentRoute == 'proyecto-g') {
             return redirect()->route('proyecto-g')->with('success', 'Proyecto eliminado con éxito');
@@ -328,7 +305,7 @@ class ProyectoController extends Controller
 
         return view("Proyecto.indexProyecto", compact("ListProyecto"));
     }
-//###########################################################################################
+    //###########################################################################################
     public function asignarResponsable(Request $request, $id)
     {
         $data = $request->validate([
@@ -393,17 +370,6 @@ class ProyectoController extends Controller
         return view('proyecto.proyecto-disponible', compact('proyectos'));
     }
 
-    public function retornar_departamentos()
-    {
-        /*
-        $departamentos = Departamento::all();
-        $secciones = Seccion::all();
-        return view("proyecto.publicar-proyecto", compact('departamentos', 'secciones'));
-        */
-        $departamentos = Departamento::all();
-        $secciones = Seccion::with('departamento')->get();
-        return view("proyecto.publicar-proyecto", compact('departamentos', 'secciones'));
-    }
 
     public function totalProyectosActivos()
     {
@@ -447,23 +413,28 @@ class ProyectoController extends Controller
         $user = Auth::user();
 
         if ($user->hasRole('Tutor')) {
+
+            $enProgresoEstados = [2, 3, 4];
+            $completadosEstados = [5, 7];
+            $enRevisionEstados = [1, 8, 9];
+
             $datos = DB::table('asignaciones')
                 ->join('proyectos', 'asignaciones.id_proyecto', '=', 'proyectos.id_proyecto')
-                ->selectRaw("
-                    COUNT(CASE WHEN proyectos.estado IN (2, 3, 4) THEN 1 END) as en_progreso,
-                    COUNT(CASE WHEN proyectos.estado IN (5, 7) THEN 1 END) as completados,
-                    COUNT(CASE WHEN proyectos.estado IN (1, 8, 9) THEN 1 END) as en_revision
-                ")
+                ->select([
+                    DB::raw("COUNT(CASE WHEN proyectos.estado IN (" . implode(',', $enProgresoEstados) . ") THEN 1 END) as en_progreso"),
+                    DB::raw("COUNT(CASE WHEN proyectos.estado IN (" . implode(',', $completadosEstados) . ") THEN 1 END) as completados"),
+                    DB::raw("COUNT(CASE WHEN proyectos.estado IN (" . implode(',', $enRevisionEstados) . ") THEN 1 END) as en_revision")
+                ])
                 ->where('asignaciones.id_tutor', $user->id_usuario)
                 ->first();
         } else {
 
-            $datos = DB::table('proyectos')
-                ->selectRaw("
-                    COUNT(CASE WHEN estado IN (2, 3, 4) THEN 1 END) as en_progreso,
-                    COUNT(CASE WHEN estado IN (5, 7) THEN 1 END) as completados,
-                    COUNT(CASE WHEN estado IN (1, 8, 9) THEN 1 END) as en_revision
-                ")
+
+            $datos = Proyecto::selectRaw("
+        COUNT(CASE WHEN estado IN (2, 3, 4) THEN 1 END) as en_progreso,
+        COUNT(CASE WHEN estado IN (5, 7) THEN 1 END) as completados,
+        COUNT(CASE WHEN estado IN (1, 8, 9) THEN 1 END) as en_revision
+    ")
                 ->first();
         }
 
@@ -721,9 +692,7 @@ class ProyectoController extends Controller
     public function update_proyecto(UpdateRequest $request, $id)
     {
         $proyecto = Proyecto::findOrFail($id);
-
-        $proyecto->update($request->validated()->all());
-
+        $proyecto->update($request->validated());
         return redirect()->route('proyecto-disponible')->with('success', 'Proyecto actualizado con éxito');
     }
 

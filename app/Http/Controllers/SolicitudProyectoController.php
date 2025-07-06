@@ -138,21 +138,22 @@ class SolicitudProyectoController extends Controller
 
     public function store_solicitud(StoreSolicitudRequest $request)
     {
+        $data = $request->validated();
         $estudiantesSeleccionados = json_decode($request->input('estudiantes'), true);
 
         try {
             // Crear el proyecto
             $proyecto = Proyecto::create([
-                'nombre_proyecto' => $request['nombre_proyecto'],
-                'descripcion_proyecto' => strip_tags($request['descripcion']),
-                'lugar' => $request['lugar'],
+                'nombre_proyecto' => $data['nombre_proyecto'],
+                'descripcion_proyecto' => strip_tags($data['descripcion']),
+                'lugar' => $data['lugar'],
                 'estado' => 9, // Estado inicial de solicitud
                 'horas_requeridas' => 0, // Inicialmente en 0
                 'periodo' => now()->format('Y-m'),
                 'coordinador' => auth()->id(),
-                'seccion_id' => $request['id_seccion'],
-                'fecha_inicio' => $request['fecha_inicio'],
-                'fecha_fin' => $request['fecha_fin'],
+                'seccion_id' => $data['id_seccion'],
+                'fecha_inicio' => $data['fecha_inicio'],
+                'fecha_fin' => $data['fecha_fin'],
             ]);
 
             // Asociar estudiantes al proyecto
@@ -162,7 +163,7 @@ class SolicitudProyectoController extends Controller
 
                 app(NotificacionController::class)->enviarNotificacion(
                     $idCoordinador,
-                    'Se ha solicitado la aprobación del proyecto ' . $request['nombre_proyecto']
+                    'Se ha solicitado la aprobación del proyecto ' . $data['nombre_proyecto']
                 );
 
                 foreach ($estudiantesSeleccionados as $idEstudiante) {

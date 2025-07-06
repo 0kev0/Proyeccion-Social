@@ -25,11 +25,11 @@ class UpdateRequest extends FormRequest
     {
         return [
             // Reglas de validación
-            'titulo' => ['required', 'string', 'max:255', 'regex:/^\S.*$/', Rule::unique('proyectos', 'nombre_proyecto')->ignore($this->route('id'), 'id_proyecto'),], // Ignorar el proyecto actual
-            'descripcion' => 'required|string|max:1000',
-            'ubicacion' => 'required|string|max:255',
-            'horas' => 'required|integer|min:0',
-            'id_seccion' => 'required|exists:secciones,id_seccion',
+            'nombre_proyecto' => ['required', 'string', 'max:255', 'regex:/^\S.*$/', Rule::unique('proyectos', 'nombre_proyecto')->ignore($this->route('id'), 'id_proyecto')], // Ignorar el proyecto actual
+            'descripcion_proyecto' => 'required|string|max:1000',
+            'lugar' => 'required|string|max:255', 
+            'horas_requeridas' => 'required|integer|min:0|max:500',
+            'seccion_id' => 'required|exists:secciones,id_seccion',
         ];
     }
 
@@ -42,11 +42,11 @@ class UpdateRequest extends FormRequest
     {
         return [
             // Nombres de atributos
-            'titulo' => 'Nombre del proyecto',
-            'descripcion' => 'Descripcion del proyecto',
-            'horas' => 'Horas requeridas',
-            'ubicacion' => 'Ubicacion del proyecto',
-            'id_seccion' => 'Seccion',
+            'nombre_proyecto' => 'Nombre del proyecto', 
+            'descripcion_proyecto' => 'Descripción del proyecto', 
+            'lugar' => 'Ubicación del proyecto', 
+            'horas_requeridas' => 'Horas requeridas',
+            'seccion_id' => 'Sección',
         ];
     }
 
@@ -60,12 +60,14 @@ class UpdateRequest extends FormRequest
     {
         return [
             // mensajes de error
-            'titulo.required' => 'El nombre del proyecto es obligatorio.',
-            'titulo.unique' => 'Ya existe un proyecto con este nombre, prueba con otro por favor.',
-            'descripcion.required' => 'La descripción del proyecto es obligatoria.',
-            'horas.required' => 'Indique las horas requeridas.',
-            'ubicacion.required' => 'La ubicación del proyecto es obligatoria.',
-            'id_seccion.required' => 'Seleccione una sección para el proyecto.',
+            'nombre_proyecto.required' => 'El nombre del proyecto es obligatorio.',
+            'nombre_proyecto.unique' => 'Ya existe un proyecto con este nombre, prueba con otro por favor.',
+            'descripcion_proyecto.required' => 'La descripción del proyecto es obligatoria.',
+            'horas_requeridas.required' => 'Indique las horas requeridas.',
+            'horas_requeridas.min' => 'Minimo de :attribute de 100 hrs.',
+            'horas_requeridas.max' => 'Maximo de :attribute de 500 hrs.',
+            'lugar.required' => 'La ubicación del proyecto es obligatoria.',
+            'seccion_id.required' => 'Seleccione una sección para el proyecto.',
         ];
     }
 }

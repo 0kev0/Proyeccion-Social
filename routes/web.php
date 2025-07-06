@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\DepartamentoController;
-use App\Http\Controllers\TestsKevControllerController;
 use App\Http\Controllers\AsignacionController;
 use App\Http\Middleware\LogedCheck;
 use Illuminate\Support\Facades\Route;
@@ -11,24 +10,21 @@ use App\Http\Controllers\EstudianteController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\DocumentoController;
 use App\Http\Controllers\EstadoController;
-use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\HorasSocialesController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\ProyectosDocumentosController;
 use App\Http\Controllers\ProyectosEstudiantesController;
 use App\Http\Controllers\RoleController;
-use Illuminate\Http\Request;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Estado;
 use App\Models\Proyecto;
-use App\Http\Middleware\RolCheck;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\SolicitudesController;
-use app\Http\Controllers\SolicitudProyectoController;
 use App\Http\Controllers\SoliciudHorasController;
+use App\Http\Controllers\SolicitudProyectoController;
+
 
 //LOGIN/WELCOME-------------------------------------------------------------------------------------------------------------------------------------
 Route::get('/', function () {
@@ -85,7 +81,6 @@ Route::middleware([LogedCheck::class])->group(function () {
         Route::get('/detalles-mi-proyecto', [ProyectosEstudiantesController::class, 'Detalles_proyecto'])->name('detallesmio');
 
         // Solicitudes y procesos
-        Route::get('/solicitud-proyecto', [ProyectoController::class, 'solicitud_proyecto'])->name('solicitud_proyecto');
         Route::get('/solicitud-proyecto', [ProyectosEstudiantesController::class, 'Solicitud_Proyecto_Student'])->name('solicitud-proyecto');
         Route::get('/solicitud-proyecto/create', [ProyectoController::class, 'create'])->name('solicitud_proyecto.create');
         Route::get('/procesos', [ProyectosEstudiantesController::class, 'Procesos'])->name('vista_procesos_horas');
@@ -107,8 +102,6 @@ Route::middleware([LogedCheck::class])->group(function () {
         Route::post('/store_solicitud', [SolicitudProyectoController::class, 'store_solicitud'])->name('proyectos.store_solicitud');
         Route::post('/store_solicitud_alumno', [SolicitudProyectoController::class, 'store_solicitud_alumno'])->name('store_solicitud_alumno');
 
-        // === Notas importantes ===
-        // Hay rutas duplicadas para `/solicitud-proyecto`. Asegúrate de eliminar los duplicados o combinar la lógica en un único controlador o método para evitar conflictos.
     });
 
 
@@ -390,18 +383,13 @@ Route::middleware([LogedCheck::class])->group(function () {
         Route::delete('/layouts/roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy');
         Route::put('/layouts/roles/{role}', [RoleController::class, 'update'])->name('roles.update');
 
-        //ruta solicitud proyectos de estudiantes
-        Route::get('/solicitudproyecto', function () {
-            return view('estudiantes.solicitud-proyecto');
-        });
-
         Route::get('/gestor-de-TI', [ProyectoController::class, 'gestor_de_TI'])->name('gestor_de_TI');
         Route::get('/obtener-tutores-por-seccion/{id}', [ProyectoController::class, 'GetTutoresPorSeccion']);
 
         //solicitudes de avance de horas
         Route::get('/proyecto/{id}/solicitudes/{solicitud}', [SoliciudHorasController::class, 'mostrarSolicitud'])->name('RevisionSolicitud');
         Route::get('/proyecto/{id}/solicitudes', [SoliciudHorasController::class, 'solicitudes_avance_horas'])->name('solicitudes_avance_horas');
-        route::post('/proyecto/{id}/solicitudes/{solicitud}/aprobar', [SoliciudHorasController::class, 'aprobarSolicitud'])->name('aprobarSolicitud');
+        route::post('/proyecto/{id}/solicitudes/{solicitud}/aprobar', [SoliciudHorasController::class, 'aprobarSolicituda'])->name('aprobarSolicitud');
         route::post('/proyecto/{id}/solicitudes/{solicitud}/denegar', [SoliciudHorasController::class, 'denegarSolicitud'])->name('denegarSolicitud');
 
         Route::get('/usuarios3', [UserController::class, 'getUsersWithSeccion'])->name('usuarios.getUsersWithSeccion');

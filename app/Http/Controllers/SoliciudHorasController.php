@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Estado;
 use App\Models\Estudiante;
 use App\Models\HistoriaHorasActualizada;
 use App\Models\Proyecto;
@@ -11,7 +12,7 @@ use Illuminate\Http\Request;
 
 class SoliciudHorasController extends Controller
 {
-//donde se usa?
+    //donde se usa?
     public function revisarSolicitud(Request $request, $id)
     {
         $user = auth()->user();
@@ -56,7 +57,7 @@ class SoliciudHorasController extends Controller
         $rutaDocs = 'storage/solicitudes/';
         return view('proyecto.proyecto-solicitudes-revision', compact('solicitud', 'proyecto', 'usuario', 'estudiante', 'rutaDocs'));
     }
-    
+
     //to service
 
     public function solicitudes_avance_horas(string $id)
@@ -81,7 +82,7 @@ class SoliciudHorasController extends Controller
     public function aprobarSolicitud(string $id, string $solicitudId)
     {
         $solicitud = Solicitud::find($solicitudId);
-        //dd($solicitud);
+
         if (!$solicitud) {
             return redirect()->route('proyecto-g')->with('error', 'Solicitud no encontrada');
         }
@@ -96,21 +97,33 @@ class SoliciudHorasController extends Controller
             return redirect()->route('proyecto-g')->with('error', 'Estudiante no encontrado');
         }
 
+        //dd('Horas completadas del proyecto antes de la validación: ' . $proyecto->horas_completadas . 'horas requeridas ' . $proyecto->horas_requeridas);
+
+        
+        if ($proyecto->horas_requeridas <= $proyecto->horas_completadas) {
+            $proyecto->estado = 5; //completado
+            $proyecto->save();
+        }
         // Calcular el nuevo porcentaje de progreso del estudiante
         $porcentajeNuevo = $proyecto->horas_requeridas > 0
             ? round((($estudiante->horas_sociales_completadas + $solicitud->valor) / $proyecto->horas_requeridas) * 100, 2)
             : 0;
 
+            $proyecto->horas_completadas += $solicitud->valor;
+            $proyecto->save();
         // Actualizar las horas sociales completadas y el porcentaje
         $estudiante->horas_sociales_completadas += $solicitud->valor;
-        $estudiante->porcentaje_completado = $porcentajeNuevo; // Asegúrate de que esté actualizando correctamente
+
+        // Asegúrate de que esté actualizando correctamente el porcentaje
+        $estudiante->porcentaje_completado = round(($estudiante->horas_sociales_completadas / 500) * 100, 2); // Redondear a 2 decimales
+        //    dd('nuevo porcentaje', $estudiante->porcentaje_completado);
+        // Guardar los cambios en la base de datos
+        $estudiante->save();
 
         // Actualizar el estado de la solicitud
         $solicitud->estado = 10;
         $solicitud->save();
 
-        // Guardar los cambios en Estudiante y Solicitud
-        $estudiante->save();
 
         // Guardar la información de horas aceptadas en la tabla de historial
         HistoriaHorasActualizada::create([
@@ -122,7 +135,8 @@ class SoliciudHorasController extends Controller
         ]);
 
         // Redirigir con mensaje de éxito
-        return redirect()->route('solicitudes_avance_horas', [
+        //preguntar si quiere asignar tutor ya 
+        return to_route('solicitudes_avance_horas', [
             'id' => $proyecto->id_proyecto
         ])->with('success', 'Solicitud aprobada y horas registradas correctamente');
     }
@@ -131,8 +145,7 @@ class SoliciudHorasController extends Controller
         $solicitud = Solicitud::find($solicitudId);
         $proyecto = Proyecto::find($solicitud->id_proyecto);
         $estudiante = Estudiante::where('id_estudiante', $solicitud->id_estudiante)->first();
-        $usuario = User
-        +::find($estudiante->id_usuario);
+        $usuario = User::find($estudiante->id_usuario);
 
         if (!$solicitud) {
             return redirect()->route('proyecto-g')->with('error', 'Solicitud no encontrada');

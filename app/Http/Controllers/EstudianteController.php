@@ -51,8 +51,8 @@ class EstudianteController extends Controller
 
     public function ProgresoGlobal(int $id)
     {
-        $estudiante = Estudiante::find($id);
-
+        $estudiante = User::find($id);
+        //dd($estudiante,$id);
         return view("estudiantes.ProgresoGlobal", compact("estudiante"));
     }
 
@@ -136,7 +136,7 @@ class EstudianteController extends Controller
     }
     public function register(RegisterRequest $request)
     {
-/////////////////////////////
+        /////////////////////////////
 
         $usuario = User::create([
             'name' => $request['name'],
@@ -201,7 +201,7 @@ class EstudianteController extends Controller
 
     public function seccionesDisponibles()
     {
-/////////////////////////////
+        /////////////////////////////
 
         $secciones = DB::table('secciones')
             ->join('departamentos', 'secciones.id_departamento', '=', 'departamentos.id_departamento')
@@ -213,7 +213,7 @@ class EstudianteController extends Controller
 
     public function estudiantesPorSeccion($idSeccion)
     {
-/////////////////////////////
+        /////////////////////////////
 
         $estudiantes = Estudiante::with('usuario')
             ->whereDoesntHave('proyecto')
@@ -249,7 +249,7 @@ class EstudianteController extends Controller
         return response()->json($estudiantes);
     }
 
-/////////////////////////////to service
+    /////////////////////////////to service
     public function actualizarHorasView()
     {
         $user = auth()->user();
@@ -281,6 +281,7 @@ class EstudianteController extends Controller
 
     public function Solicitud_avance_horas(Solicitud_avance_horasRequest $request)
     {
+        $data=$request->validated();
         $nombreProyecto = Proyecto::find($request->idProyecto)->nombre_proyecto;
 
         try {
@@ -290,8 +291,6 @@ class EstudianteController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Error al subir el archivo');
         }
-
-/////////////////////////////
 
         $valorHoras = $request->horasTrabajadas;
         $estudiante = $request->idEstudiante_;

@@ -2,9 +2,7 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Estudiante;
 use App\Models\Proyecto;
@@ -22,6 +20,7 @@ class AsignacionesSeeder extends Seeder
         $estudiantes = Estudiante::all();
         $proyectos = Proyecto::all();
         $tutores = User::role('Tutor')->get();
+
         foreach ($estudiantes as $estudiante) {
             try {
                 $proyecto = $proyectos->random();

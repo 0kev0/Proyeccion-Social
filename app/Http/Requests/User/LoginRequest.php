@@ -12,7 +12,7 @@ class LoginRequest extends FormRequest
     public function authorize(): bool
     {
         // regla para verificar permiso 
-        return auth()->user()->hasAnyRole(['Administrador', 'Coordinador']);
+        return true;
     }
 
     /**
@@ -25,7 +25,7 @@ class LoginRequest extends FormRequest
         return [
             // reglas de validación 
             'correo' => 'required|email|max:255',
-            'contrasena' => 'required|string|min:8|max:20|regex:/[a-zA-Z]/|regex:/[0-9]/',
+            //'contrasena' => 'required|string|min:8|max:20|regex:/[a-zA-Z]/|regex:/[0-9]/',
         ];
     }
 

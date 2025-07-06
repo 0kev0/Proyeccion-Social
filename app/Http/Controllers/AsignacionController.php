@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\AsignacionExport;
+use App\Http\Requests\Asignacion\AsignarEstudianteRequest;
 use App\Http\Requests\Asignacion\StoreAsignacionRequest;
 use App\Http\Requests\Asignacion\UpdateAsignacionRequest;
 use App\Http\Requests\Proyecto\AsignarProyectoRequest;
@@ -45,9 +46,8 @@ class AsignacionController extends Controller
     public function store(StoreAsignacionRequest $request)
     {
         try {
-            Asignacion::create($request->all());
+            Asignacion::create($request->validated());
             return redirect()->route('asignaciones.index')->with('success', 'Asignación creada con éxito');
-        
         } catch (\Exception $e) {
             // Manejo de errores en caso de fallo
             return redirect()->back()
@@ -106,7 +106,6 @@ class AsignacionController extends Controller
             }
         }
 
-/////////////////////////////
         // Actualizar los datos del proyecto
         $proyecto->update([
             'tutor' => $tutor->id_usuario ?? null,
@@ -122,7 +121,7 @@ class AsignacionController extends Controller
         return redirect()->route('gestion-proyecto')->with('success', 'Proyecto actualizado correctamente.');
     }
 
-    public function asignarEstudiante(Request $request, $idProyecto)
+    public function asignarEstudiante(AsignarEstudianteRequest $request, $idProyecto)
     {
         // Buscar al estudiante por id
         $estudiante = Estudiante::find($request->idEstudiante);

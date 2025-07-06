@@ -94,6 +94,9 @@
                     <!-- Campo oculto para almacenar estudiantes seleccionados -->
                     <input type="hidden" id="estudiantesSeleccionados" name="estudiantes">
 
+                    <input type="hidden" id="estado" name="estado" value="10">
+
+
                     <ul id="listaEstudiantes" class="list-unstyled"></ul>
 
                     <div class="mb-3">
@@ -114,7 +117,7 @@
                         </div>
                         <div class="col-6">
                             <label for="horas" class="form-label">Horas Requeridas</label>
-                            <input type="text" class="form-control" id="horas" name="horas" >
+                            <input type="text" class="form-control" id="horas" name="horas">
                         </div>
                     </div>
 
@@ -129,7 +132,7 @@
                         </div>
                     </div>
 
-
+                    <!-- 
                     <div class="mb-3">
                         <label for="estado" class="form-label">Estado</label>
                         <select class="form-select" id="estado" name="estado">
@@ -139,22 +142,22 @@
                             </option>
                             @endforeach
                         </select>
-
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100 btn-gestion fw-bold">Asignar Proyecto</button>
-                </form>
-
+-->
             </div>
+            <button type="submit" class="btn btn-primary w-100 btn-gestion fw-bold">Asignar Proyecto</button>
+            </form>
+
         </div>
     </div>
+</div>
 
-    <div id="tutores-data" data-tutores='@json($tutores)'></div>
-    <div id="estudiantes-data" data-estudiantes='@json($estudiantes)'></div>
-    <div id="proyectos-data" data-proyectos='@json($proyectos)'></div>
+<div id="tutores-data" data-tutores='@json($tutores)'></div>
+<div id="estudiantes-data" data-estudiantes='@json($estudiantes)'></div>
+<div id="proyectos-data" data-proyectos='@json($proyectos)'></div>
 
-    <script src="{{ asset('js/filtrarTutor.js') }}"></script>
-    <script src="{{ asset('js/filtrarEstudiantes.js') }}"></script>
-    <script src="{{ asset('js/gestionProyecto.js') }}"></script>
+<script src="{{ asset('js/filtrarTutor.js') }}"></script>
+<script src="{{ asset('js/filtrarEstudiantes.js') }}"></script>
+<script src="{{ asset('js/gestionProyecto.js') }}"></script>
 
 
-    @endsection
+@endsection

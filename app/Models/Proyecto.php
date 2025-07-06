@@ -20,6 +20,7 @@ class Proyecto extends Model
         'nombre_proyecto',
         'descripcion_proyecto',
         'horas_requeridas',
+        'horas_completadas',
         'estado',
         'periodo',
         'lugar',
@@ -29,6 +30,7 @@ class Proyecto extends Model
         'fecha_fin',
         'seccion_id'
     ];
+    
 
     protected $with = ['estadoo', 'coordinadorr'];
 

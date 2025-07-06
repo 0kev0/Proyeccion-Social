@@ -7,9 +7,12 @@ use App\Http\Requests\ProyectosEstudiantes\StoreRequest;
 use App\Models\Estudiante;
 use App\Models\ProyectosEstudiantes;
 use App\Models\HistoriaHorasActualizada;
+use Illuminate\Container\Attributes\Log;
 use Illuminate\Http\Request;
 
 use App\Models\Proyecto;
+
+use function Laravel\Prompts\select;
 
 class ProyectosEstudiantesController extends Controller
 {
@@ -169,35 +172,57 @@ class ProyectosEstudiantesController extends Controller
     }
 
 
-    public function Solicitud_Proyecto_Student()
-    {
-        $estudianteId = auth()->user()->id_usuario;
+public function Solicitud_Proyecto_Student()
+{
+    // Obtener el ID del usuario autenticado
+    $estudianteId = auth()->user()->id_usuario;
+    \Log::debug("ID del estudiante autenticado: " . $estudianteId); // Mensaje de depuración
 
-        // Obtener el estudiante autenticado
-        $estudiante = Estudiante::where('id_usuario', $estudianteId)->first();
+    // Obtener el estudiante con la relación 'proyecto'
+    $estudiante = Estudiante::with('proyecto') // Asumimos que hay una relación 'proyecto' en Estudiante
+        ->where('id_usuario', $estudianteId)
+        ->first();
 
-        if (!$estudiante) {
-            // Si no se encuentra el estudiante
-            return redirect()->back()->with('error', 'No se encontró al estudiante.');
-        }
+    if (!$estudiante) {
+        \Log::debug("No se encontró al estudiante con ID: " . $estudianteId); // Mensaje de depuración
+        return redirect()->back()->with('error', 'No se encontró al estudiante.');
+    }
 
-        // Verificar si el estudiante ya tiene un proyecto asignado
-        $proyectoEstudiante = ProyectosEstudiantes::where('id_estudiante', $estudiante->id_estudiante)->first();
+    // Verificar si el estudiante tiene un proyecto asignado
+    if ($estudiante->proyecto) {
+        \Log::debug("El estudiante tiene un proyecto asignado con ID: " . $estudiante->proyecto->id_proyecto); // Mensaje de depuración
 
-        if (!$proyectoEstudiante) {
-            // Si no tiene un proyecto asignado
-            $seccion_id = $estudiante->id_seccion;
-            $proyectoEstudiante = Estudiante::where('id_seccion', $seccion_id)->first();
-
-            return view('estudiantes.solicitud-proyecto', compact('proyectoEstudiante'));
-        }
-        // Verificar si el estado del proyecto es 7
-        if ($proyectoEstudiante->estado == 7) {
+        // Verificar si el proyecto tiene un estado de 7 (estado no permitido para solicitud)
+        if ($estudiante->proyecto) {
+            \Log::debug("El proyecto tiene un estado de 7, no se puede enviar la solicitud."); // Mensaje de depuración
             return redirect()->back()->with('warning', 'No se puede enviar el proyecto, ya enviaste una solicitud.');
         }
+        $seccion_id = $estudiante->id_seccion;
 
-        return view('estudiantes.solicitud-proyecto', compact('proyectoEstudiante'));
+        \Log::debug("El proyecto tiene un estado permitido, se puede enviar la solicitud."); // Mensaje de depuración
+
+        return view('estudiantes.solicitud-proyecto', compact('estudiante','seccion_id'));
     }
+
+    // Si el estudiante no tiene un proyecto asignado
+    $seccion_id = $estudiante->id_seccion;
+    \Log::debug("El estudiante no tiene proyecto, buscando proyectos para la sección con ID: " . $seccion_id); // Mensaje de depuración
+
+    // Obtener proyectos disponibles para la sección del estudiante
+    $proyectosDisponibles = Proyecto::where('seccion_id', $seccion_id)->get();
+    \Log::debug("Proyectos disponibles para la sección: " . $proyectosDisponibles->count()); // Mensaje de depuración
+
+    if ($proyectosDisponibles->isEmpty()) {
+        \Log::debug("No hay proyectos disponibles para la sección con ID: " . $seccion_id); // Mensaje de depuración
+        return redirect()->back()->with('error', 'No hay proyectos disponibles para esta sección.');
+    }
+
+    // Mostrar vista con los proyectos disponibles
+    \Log::debug("Hay proyectos disponibles, mostrando la vista."); // Mensaje de depuración
+    return view('estudiantes.solicitud-proyecto', compact('proyectosDisponibles','seccion_id'));
+}
+
+
 
     public function Procesos()
     {

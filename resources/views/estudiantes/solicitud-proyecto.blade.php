@@ -23,7 +23,7 @@
                     <label for="nombreProyecto" class="form-label">Nombre del Proyecto</label>
                     <input type="text" class="form-control" id="nombreProyecto" name="nombre_proyecto" placeholder="Nombre del Proyecto" required>
                 </div>
-                <input type="hidden" name="id_seccion" value="{{ $proyectoEstudiante->id_seccion }}">
+                <input type="hidden" name="id_seccion" value="{{ $seccion_id }}">
 
                 <div class="mb-4">
                     <label class="form-label">Estudiantes</label>
@@ -70,7 +70,7 @@
 <script src="js/solicitudProyecto.sj"></script>
 
 <script>
-    const idSeccion = {{$proyectoEstudiante->id_seccion}};
+    const idSeccion = {{$seccion_id}};
 const selectEstudiantes = document.querySelector('#nombreEstudiante');
 const estudiantesList = document.querySelector('#estudiantesList');
 const estudiantesInput = document.querySelector('#estudiantesIds');

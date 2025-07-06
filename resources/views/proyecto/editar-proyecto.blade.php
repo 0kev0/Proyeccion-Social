@@ -42,26 +42,26 @@
                 @method('PUT')
                 <div class="mb-3">
                     <label for="titulo" class="form-label">Título del proyecto</label>
-                    <input type="text" class="form-control" id="titulo" name="titulo" value="{{ $proyecto->nombre_proyecto }}" required>
+                    <input type="text" class="form-control" id="titulo" name="nombre_proyecto" value="{{ $proyecto->nombre_proyecto }}" required>
                 </div>
 
                 <div class="mb-3">
                     <label for="descripcion" class="form-label">Descripción del proyecto</label>
-                    <textarea class="form-control" id="descripcion" name="descripcion">{{ $proyecto->descripcion_proyecto }}</textarea>
+                    <textarea class="form-control" id="descripcion" name="descripcion_proyecto">{{ $proyecto->descripcion_proyecto }}</textarea>
                 </div>
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="horas" class="form-label">Horas Requeridas</label>
-                        <input type="number" class="form-control" id="horas" name="horas" value="{{ $proyecto->horas_requeridas }}" required>
+                        <input type="number" class="form-control" id="horas" name="horas_requeridas" value="{{ $proyecto->horas_requeridas }}" required>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="ubicacion" class="form-label">Ubicación</label>
-                        <input type="text" class="form-control" id="ubicacion" name="ubicacion" value="{{ $proyecto->lugar }}" required>
+                        <input type="text" class="form-control" id="ubicacion" name="lugar" value="{{ $proyecto->lugar }}" required>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="id_seccion" class="form-label">Sección/Departamento</label>
-                        <select name="id_seccion" class="form-select" id="id_seccion" required>
+                        <select name="seccion_id" class="form-select" id="id_seccion" required>
                             <option value="">Seleccionar sección</option>
                             @php
                             $user = auth()->user();
